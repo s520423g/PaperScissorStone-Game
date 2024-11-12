@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            background-color: #fffcec;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            padding: 10px;
+        }
+
+        .box {
+            width: 1000px;
+            height: 700px;
+            border: 2px solid #804040;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .play-box {
+            width: 80%;
+            height: calc(100% / 3);
+            /* border: 2px solid #804040; */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .npc-box {
+            transform: rotate(180deg);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        p {
+            font-size: 24px;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .npc {
+            width: 32%;
+            height: 100%;
+        }
+
+        input {
+            width: 10%;
+            height: 10%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        #scissor-btn {
+            left: 6%;
+        }
+
+        #scissor-btn:checked+.scissor {
+            transform: scale(1.8);
+        }
+
+        #stone-btn {
+            left: 37%;
+        }
+
+        #stone-btn:checked+.stone {
+            transform: scale(1.8);
+        }
+
+        #paper-btn {
+            left: 68%;
+        }
+
+        #paper-btn:checked+.paper {
+            transform: scale(1.8);
+        }
+
+        .result {
+            /* background-color: #804040; */
+            height: 10%;
+            width: 40%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #804040;
+        }
+
+        .tab-box {
+            display: flex;
+            width: 1000px;
+            justify-content: space-around;
+        }
+
+        button {
+            border: none;
+            background-color: #5cadad;
+            color: #804040;
+            font-size: 24px;
+            border-radius: 20px;
+            padding: 10px 20px;
+            box-shadow: 0 0 6px #122626;
+            cursor: pointer;
+        }
+
+        .start:hover,
+        .reset:hover {
+            background-color: #71bbbb;
+            box-shadow: 0 0 15px #68dada;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box">
+            <div class="play-box">
+                <p>NPC: </p>
+                <div class="npc-box">
+                    <img src="./img/布.png" class="npc npc-paper">
+                    <img src="./img/石頭.png" class="npc npc-stone">
+                    <img src="./img/剪刀.png" class="npc npc-scissor">
+                </div>
+            </div>
+            <div class="result"></div>
+            <div class="play-box">
+                <p>ME: </p>
+                <input type="radio" id="scissor-btn" name="choice" value="scissor">
+                <label for="scissor-btn" class="scissor"><img src="./img/剪刀.png" class="scissor"></label>
+                <input type="radio" id="stone-btn" name="choice" value="stone">
+                <label for="stone-btn" class="stone"><img src="./img/石頭.png" class="stone"></label>
+                <input type="radio" id="paper-btn" name="choice" value="paper">
+                <label for="paper-btn" class="paper"><img src="./img/布.png" class="paper"></label>
+            </div>
+        </div>
+        <div class="tab-box">
+            <button type="button" class="start">START</button>
+            <button type="button" class="reset">RESTART</button>
+        </div>
+    </div>
+
+    <script>
+        let start = document.querySelector('.start');
+        let reset = document.querySelector('.reset');
+
+        let npcAll = document.querySelectorAll('.npc');
+
+        let result = document.querySelector('.result');
+
+
+        start.addEventListener('click', function () {
+            let reultText;
+            let choice = document.querySelector('input[name="choice"]:checked');
+            if (!choice) {
+                alert('請做出你的選擇');
+                return;
+            };
+
+            let npcChoice = npcPlay();
+
+            if (choice.value === 'scissor') {
+                if (npcChoice === 'npc-scissor') {
+                    result.textContent = 'NPC出剪刀嚕,平手';
+                } else if (npcChoice === 'npc-stone') {
+                    result.textContent = 'NPC出石頭嚕,YOU LOSE';
+                } else { result.textContent = 'NPC出布嚕,YOU WIN'; }
+            } else if (choice.value === 'paper') {
+                if (npcChoice === 'npc-scissor') {
+                    result.textContent = 'NPC出剪刀嚕,LOSE';
+                } else if (npcChoice === 'npc-stone') {
+                    result.textContent = 'NPC出石頭嚕,YOU WIN';
+                } else { result.textContent = 'NPC出布嚕,平手'; }
+            } else if(choice.value === 'stone') {
+                if (npcChoice === 'npc-scissor') {
+                    result.textContent = 'NPC出剪刀嚕,YOU WIN';
+                } else if (npcChoice === 'npc-stone') {
+                    result.textContent = 'NPC出石頭嚕,平手';
+                } else { result.textContent = 'NPC出布嚕,YOU LOSE'; }
+            };
+        });
+
+        function npcPlay() {
+            let choiceType = ["npc-paper", "npc-stone", "npc-scissor"];
+            let randomChoice = choiceType[Math.floor(Math.random() * 3)];
+            npcAll.forEach(npc => {
+                npc.style.transform = 'scale(1)';
+            });
+            let chosenNpc = document.querySelector(`.${randomChoice}`);
+            chosenNpc.style.transform = 'scale(1.8)';
+            return randomChoice;
+        };
+
+        reset.addEventListener('click', function () {
+            npcAll.forEach(npc => {
+                npc.style.transform = 'scale(1)';
+            });
+            let choice = document.querySelector('input[name="choice"]:checked');
+            if (choice){
+                choice.checked = false;
+            }
+            result.textContent = '';
+        });
+
+    </script>
+</body>
+
+</html>
